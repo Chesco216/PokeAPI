@@ -17,48 +17,37 @@ export class SeedService {
   private readonly axios: AxiosInstance = axios;
 
     async executeSeed() {
-    
-      const { data: { results } } = await this.axios.get<PokeResponse>('https://pokeapi.co/api/v2/pokemon?limit=20');
+
+      await this.pokemonModel.deleteMany({});
+
+      const { data: { results } } = await this.axios.get<PokeResponse>('https://pokeapi.co/api/v2/pokemon?limit=100');
+
+      // const insertPromiseArray = [];
+      const pokemoNToInsert: { name: string, no: number }[] = []
+
       results.forEach(async ({ name, url }) => {
 
         const segments = url.split('/')
         const no: number = +segments[ segments.length -2 ]
+        //* FORMA 1
+        //*? const pokemon = await this.pokemonModel.create({ name, no });
+        
+        //* FORMA 2 mas rapida
+        //?   insertPromiseArray.push(
+        //?     this.pokemonModel.create({ name, no })
+        //?   )
+        //? await Promise.all( insertPromiseArray );  // este await va afuerea de la funcion
+        
+        //* FORMA 3 MAS RECOMENDADA POR FH
+        pokemoNToInsert.push({ name, no });
 
-        const pokemon = await this.pokemonModel.create({ name, no });
-        // try {
-        //   // const pokemon = await this.pokemonModel.create( createPokemonDto );
-        //   // return pokemon;
-        //   const pokemon: CreatePokemonDto = {
-        //     name: name,
-        //     no: no
-        //   }
-        //   const createdPokemon = new this.pokemonModel(pokemon)
-        //   return createdPokemon.save();
-
-        // } catch (error) {
-        //   throw new BadRequestException( error ); 
-        // }
       });
 
+      await this.pokemonModel.insertMany( pokemoNToInsert );
+
+
+        
       return'Seed executeds';
     }
-  // create(createSeedDto: CreateSeedDto) {
-  //   return 'This action adds a new seed';
-  // }
 
-  // findAll() {
-  //   return `This action returns all seed`;
-  // }
-
-  // findOne(id: number) {
-  //   return `This action returns a #${id} seed`;
-  // }
-
-  // update(id: number, updateSeedDto: UpdateSeedDto) {
-  //   return `This action updates a #${id} seed`;
-  // }
-
-  // remove(id: number) {
-  //   return `This action removes a #${id} seed`;
-  // }
 }
