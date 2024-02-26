@@ -18,28 +18,29 @@ export class SeedService {
 
     async executeSeed() {
     
-      const { data: { results } } = await this.axios.get<PokeResponse>('https://pokeapi.co/api/v2/pokemon?limit=2');
+      const { data: { results } } = await this.axios.get<PokeResponse>('https://pokeapi.co/api/v2/pokemon?limit=20');
       results.forEach(async ({ name, url }) => {
+
         const segments = url.split('/')
         const no: number = +segments[ segments.length -2 ]
-        console.log(segments)
-        console.log({ name, no })
-        try {
-          // const pokemon = await this.pokemonModel.create( createPokemonDto );
-          // return pokemon;
-          const pokemon: CreatePokemonDto = {
-            name: name,
-            no: no
-          }
-          const createdPokemon = new this.pokemonModel(pokemon)
-          return createdPokemon.save();
 
-        } catch (error) {
-          throw new BadRequestException( error ); 
-        }
+        const pokemon = await this.pokemonModel.create({ name, no });
+        // try {
+        //   // const pokemon = await this.pokemonModel.create( createPokemonDto );
+        //   // return pokemon;
+        //   const pokemon: CreatePokemonDto = {
+        //     name: name,
+        //     no: no
+        //   }
+        //   const createdPokemon = new this.pokemonModel(pokemon)
+        //   return createdPokemon.save();
+
+        // } catch (error) {
+        //   throw new BadRequestException( error ); 
+        // }
       });
 
-      return results;
+      return'Seed executeds';
     }
   // create(createSeedDto: CreateSeedDto) {
   //   return 'This action adds a new seed';
